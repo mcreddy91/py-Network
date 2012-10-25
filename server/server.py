@@ -11,13 +11,20 @@ ser_socket.bind(('',port))
 ser_socket.listen(5)
 while 1:
 	con,client = ser_socket.accept()
-	file_name = con.recv(1024)
-	if not file_name:
-		continue
-	f = open(file_name,'w')
+	file_name = con.recv(512).split("%%eofn%%")
+	fil = file_name[0]
+	data1 = file_name[1]
+	f = open(fil,'w')
+	count = 0
 	while 1:
-		data = con.recv(1024)
-		if not data: break
-		f.write(data)
-	print "Recivied file %s from remote client... saved!"%file_name
+		data = con.recv(512)
+		if not data:
+			f.close()
+			break
+		else:
+			if count == 0:
+				data = data1+data
+			f.write(data)
+			count = count+1
+	print "Recivied file %s from remote client... saved!"%fil
 	con.close()

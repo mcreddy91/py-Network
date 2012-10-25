@@ -16,9 +16,17 @@ except:
 file_name = raw_input("Enter file name to send: ")
 try:
 	f = open(file_name,'r')
-	cl_socket.send(file_name)
+	cl_socket.send(file_name+"%%eofn%%")
 	print "Sending file...",
-	cl_socket.sendall(f.read())
+	#cl_socket.sendall(f.read())
+	while 1:
+		line = f.readline()
+		if not line:
+			f.close()
+			cl_socket.close()
+			break
+		else:
+			cl_socket.send(line)
 	print " Done!"
 except:
 	print "No such file exists!"

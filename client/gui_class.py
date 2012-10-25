@@ -46,12 +46,11 @@ class makeGui:
 			try:
 				f = open(fil,'r')
 				fil = fil.split('/')[-1]
-				self.cl_socket.send(fil)
+				self.cl_socket.send(fil+"%%eofn%%")
 				print "Sending file...%s"%fil,
 				while 1:
-					data = f.read(1024)
+					data = f.readline()
 					if not data:
-						self.cl_socket.close()
 						break
 					self.cl_socket.send(data)
 				print " Done!"
@@ -62,13 +61,6 @@ class makeGui:
 	def bindEnter(self, event ):
 		self.connect()
 
-	def replyFromServer(self,reply):
-		if reply == 0:
-			tkMessageBox.showerror("Failed to Connect","Please check server configurations.")
-			return None
-		elif reply == 1:
-			tkMessageBox.showinfo("Connected","Successfully connected!");
-			return None
 
 	def connect(self):
 		ipAdd = self.ipAdd.get()
@@ -86,10 +78,8 @@ class makeGui:
 			self.cl_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			try:
 				self.cl_socket.connect((ipAdd,int(portAdd)))				
-				self.replyFromServer(1)
-				self.findFileWindow()
+				tkMessageBox.showinfo("Connected","Successfully connected!")
 				self.connected = 1
-
+				self.frame.destroy()
 			except Exception,e:
-				print e
-				self.replyFromServer(0)
+				tkMessageBox.showerror("Failed to connect...",e)				
